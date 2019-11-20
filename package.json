@@ -12,9 +12,9 @@
     "url": "https://github.com/Lushenggang/vue-search-highlight"
   },
   "license": "MIT",
-  "main": "dist/vue-outline.common.js",
-  "unpkg": "dist/vue-outline.min.js",
-  "module": "dist/vue-outline.esm.js",
+  "main": "dist/vue-search-highlight.common.js",
+  "unpkg": "dist/vue-search-highlight.min.js",
+  "module": "dist/vue-search-highlight.esm.js",
   "private": false,
   "files": [
     "dist"

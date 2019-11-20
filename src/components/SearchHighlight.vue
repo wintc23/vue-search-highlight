@@ -54,6 +54,18 @@ export default {
         this.lightIndex = 0
         this.getMatchCount()
       }
+    },
+    lightIndex: {
+      immediate: true,
+      handler () {
+        this.$emit('current-change', this.lightIndex)
+      }
+    },
+    matchCount: {
+      immediate: true,
+      handler () {
+        this.$emit('mactch-count-change', this.matchCount)
+      }
     }
   },
   methods: {
