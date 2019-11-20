@@ -6,6 +6,8 @@
 </template>
 
 <script>
+const CLASS_NAME = 'search-hightlight'
+
 export default {
   props: {
     content: {
@@ -41,7 +43,7 @@ export default {
       let content = ''
       for (let i = 0; i < stringList.length - 1; i++) {
         let style = i === this.lightIndex ? this.currentStyle : this.highlightStyle
-        content += `${stringList[i]}<font style="${style}" search-hightlight>${this.keyword}</font>`
+        content += `${stringList[i]}<font style="${style}" ${CLASS_NAME}>${this.keyword}</font>`
       }
       content += stringList[stringList.length - 1]
       return content
@@ -71,7 +73,7 @@ export default {
   methods: {
     scrollTo (index) {
       this.$nextTick(() => {
-        let list = this.$el.querySelectorAll(`font[search-hightlight]`)
+        let list = this.$el.querySelectorAll(`font[${CLASS_NAME}]`)
         if (list[index]) {
           this.lightIndex = index
           list[index].scrollIntoView()
@@ -80,25 +82,19 @@ export default {
     },
     searchNext () {
       this.$nextTick(() => {
-        if (this.lightIndex >= this.matchCount - 1) {
-          this.lightIndex = 0
-        } else {
-          this.lightIndex++
-        }
+        let idx = this.lightIndex >= this.matchCount - 1 ? 0 : this.lightIndex + 1
+        this.scrollTo(idx)
       })
     },
     searchLast () {
       this.$nextTick(() => {
-        if (this.lightIndex <= 0) {
-          this.lightIndex = this.matchCount - 1
-        } else {
-          this.lightIndex--
-        }
+        let idx = this.lightIndex <= 0 ? this.matchCount - 1 : this.lightIndex - 1
+        this.scrollTo(idx)
       })
     },
     getMatchCount () {
       this.$nextTick(() => {
-        let list = this.$el.querySelectorAll(`font[search-hightlight]`)
+        let list = this.$el.querySelectorAll(`font[${CLASS_NAME}]`)
         this.matchCount = list.length
       })
     },
