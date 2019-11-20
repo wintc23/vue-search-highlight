@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "keywords": [
     "搜索高亮",
-    "vue"
+    "vue",
+    "关键字高亮"
   ],
   "author": "Lushenggang <lushg-tcxg@qq.com>",
   "repository": {
