@@ -1,11 +1,29 @@
 {
   "name": "vue-search-highlight",
   "version": "0.1.0",
-  "private": true,
+  "keywords": [
+    "搜索高亮",
+    "vue"
+  ],
+  "author": "Lushenggang <lushg-tcxg@qq.com>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Lushenggang/vue-search-highlight"
+  },
+  "license": "MIT",
+  "main": "dist/vue-outline.common.js",
+  "unpkg": "dist/vue-outline.min.js",
+  "module": "dist/vue-outline.esm.js",
+  "private": false,
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "build-bundle": "vue-cli-service build --target lib --name vue-search-highlight ./src/index.js",
+    "prepublishOnly": "git push && yarn build-bundle"
   },
   "dependencies": {
     "core-js": "^2.6.5",

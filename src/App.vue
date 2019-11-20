@@ -1,17 +1,17 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <search-highlight content="一条大河你呀A你呀你A呀你呀A你呀你呀你呀你呀你呀as你呀AS" keyword="你呀">
+    </search-highlight>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import SearchHighlight from './components/SearchHighlight.vue'
 
 export default {
   name: 'app',
   components: {
-    HelloWorld
+    SearchHighlight
   }
 }
 </script>
@@ -24,5 +24,6 @@ export default {
   text-align: center;
   color: #2c3e50;
   margin-top: 60px;
+  width: 60px;
 }
 </style>
