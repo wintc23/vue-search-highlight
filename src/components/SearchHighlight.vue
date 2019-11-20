@@ -1,7 +1,5 @@
 <template>
-  <div
-    class="search-highlight"
-    v-html="contentShow">
+  <div class="search-highlight" v-html="contentShow">
   </div>
 </template>
 
@@ -42,7 +40,7 @@ export default {
       if (!stringList.length) return this.content
       let content = ''
       for (let i = 0; i < stringList.length - 1; i++) {
-        let style = i === this.lightIndex ? this.currentStyle : this.highlightStyle
+        let style = i === this.lightIndex - 1 ? this.currentStyle : this.highlightStyle
         content += `${stringList[i]}<font style="${style}" ${CLASS_NAME}>${this.keyword}</font>`
       }
       content += stringList[stringList.length - 1]
@@ -53,7 +51,6 @@ export default {
     keyword: {
       immediate: true,
       handler () {
-        this.lightIndex = 0
         this.getMatchCount()
       }
     },
@@ -74,21 +71,21 @@ export default {
     scrollTo (index) {
       this.$nextTick(() => {
         let list = this.$el.querySelectorAll(`font[${CLASS_NAME}]`)
-        if (list[index]) {
+        if (list[index - 1]) {
           this.lightIndex = index
-          list[index].scrollIntoView()
+          list[index - 1].scrollIntoView()
         }
       })
     },
     searchNext () {
       this.$nextTick(() => {
-        let idx = this.lightIndex >= this.matchCount - 1 ? 0 : this.lightIndex + 1
+        let idx = this.lightIndex >= this.matchCount ? 1 : this.lightIndex + 1
         this.scrollTo(idx)
       })
     },
     searchLast () {
       this.$nextTick(() => {
-        let idx = this.lightIndex <= 0 ? this.matchCount - 1 : this.lightIndex - 1
+        let idx = this.lightIndex <= 1 ? this.matchCount : this.lightIndex - 1
         this.scrollTo(idx)
       })
     },
@@ -96,6 +93,8 @@ export default {
       this.$nextTick(() => {
         let list = this.$el.querySelectorAll(`font[${CLASS_NAME}]`)
         this.matchCount = list.length
+        this.lightIndex = this.matchCount ? 1 : 0
+        this.scrollTo(this.lightIndex)
       })
     },
   }

@@ -3,12 +3,15 @@
     <div class="container">
       <div class="header">
         <input type="text" v-model="keyword">
+        <div class="match-num">{{ currentIdx }} / {{ matchCount }}</div>
         <button @click.stop="searchLast">上一个</button>
         <button @click.stop="searchNext">下一个</button>
       </div>
       <search-highlight
         class="search-highlight"
         ref="search"
+        @current-change="currentChange"
+        @mactch-count-change="matchCountChange"
         :content="content"
         :keyword="keyword">
       </search-highlight>
@@ -27,6 +30,8 @@ export default {
   data () {
     return {
       keyword: '月',
+      currentIdx: 0,
+      matchCount: 0,
       content: `
             春江花月夜
                 [唐] 张若虚
@@ -56,7 +61,13 @@ export default {
     },
     searchNext () {
       this.$refs.search.searchNext()
-    }
+    },
+    matchCountChange (count) {
+      this.matchCount = count
+    },
+    currentChange (idx) {
+      this.currentIdx = idx
+    },
   }
 }
 </script>
@@ -68,6 +79,7 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
+  display: flex;
 }
 body {
   margin: 0;
@@ -78,7 +90,7 @@ body {
 <style>
 
 .container {
-  max-width: 20rem;
+  max-width: 30rem;
   height: 100vh;
   box-sizing: border-box;
   margin: 0 auto;
@@ -88,9 +100,16 @@ body {
 }
 
 .header {
+  text-align: center;
   display: flex;
   height: 40px;
   align-items: center;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+
+button {
+  margin: 0 2px;
   flex-shrink: 0;
 }
 
