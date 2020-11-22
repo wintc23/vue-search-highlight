@@ -11,7 +11,7 @@
         class="search-highlight"
         ref="search"
         @current-change="currentChange"
-        @mactch-count-change="matchCountChange"
+        @match-count-change="matchCountChange"
         :content="content"
         :keyword="keyword">
       </search-highlight>
@@ -33,9 +33,9 @@ export default {
       currentIdx: 0,
       matchCount: 0,
       content: `
-            春江花月夜
+            <span>春江花月夜</span>
                 [唐] 张若虚
-      春江潮水连海平，海上明月共潮生。
+      春江潮水连海平，海上<span style="color: red">明月</span>共潮生。
       滟滟随波千万里，何处春江无月明！
       江流宛转绕芳甸，月照花林皆似霰；
       空里流霜不觉飞，汀上白沙看不见。
