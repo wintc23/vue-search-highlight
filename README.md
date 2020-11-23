@@ -1,5 +1,5 @@
 # vue-search-highlight
-Vue文本关键字高亮组件。
+Vue文本关键字高亮组件，v1.1.0开始支持HTML内容跨标签匹配关键字。
 
 ## 安装
 ```bash
@@ -51,7 +51,7 @@ components: {
   class="search-highlight"
   ref="search"
   @current-change="currentChange"
-  @mactch-count-change="matchCountChange"
+  @match-count-change="matchCountChange"
   :content="content"
   :keyword="keyword">
 </search-highlight>
@@ -67,11 +67,11 @@ export default {
     return {
       currentIdx: 0,
       matchCount: 0,
-      keyword: '月',
+      keyword: '明月',
       content: `
             春江花月夜
                 [唐] 张若虚
-      春江潮水连海平，海上明月共潮生。
+      春江潮水连海平，海上明<b>月</b>共潮生。
       滟滟随波千万里，何处春江无月明！
       江流宛转绕芳甸，月照花林皆似霰；
       空里流霜不觉飞，汀上白沙看不见。
@@ -80,7 +80,7 @@ export default {
       人生代代无穷已，江月年年望相似。
       不知江月待何人，但见长江送流水。
       白云一片去悠悠，青枫浦上不胜愁。
-      谁家今夜扁舟子？何处相思明月楼？
+      谁家今夜扁舟子？何处相思明<b>月</b>楼？
       可怜楼上月徘徊，应照离人妆镜台。
       玉户帘中卷不去，捣衣砧上拂还来。
       此时相望不相闻，愿逐月华流照君。
