@@ -30,7 +30,7 @@ export default {
       lightIndex: 0,
       matchCount: 0,
       contentShow: '',
-      random: Math.random()
+      random: `${Math.random()}`.slice(2)
     }
   },
   computed: {
@@ -40,15 +40,18 @@ export default {
     watchStyle () {
       return [this.lightIndex, this.highlightStyle, this.currentStyle]
     },
+    flag () {
+      return `${PLUGIN_FLAG}${this.random}`
+    },
     styleSelector () {
-      return `style[${PLUGIN_FLAG}='${this.random}']`
-    }
+      return `style[${this.flag}]`
+    },
   },
   watch: {
     watchString: {
       immediate: true,
       handler () {
-        this.refresh()
+        this.replaceKeywords()
       }
     },
     watchStyle: {
@@ -74,59 +77,83 @@ export default {
     this.clearStyle()
   },
   methods: {
-    refresh () {
+    getTextNodeList (dom) {
+      const nodeList = [...dom.childNodes]
+      const textNodes = []
+      while (nodeList.length) {
+        const node = nodeList.shift()
+        if (node.nodeType === node.TEXT_NODE) {
+          node.wholeText && textNodes.push(node)
+        } else {
+          nodeList.unshift(...node.childNodes)
+        }
+      }
+      return textNodes
+    },
+
+    getTextInfoList (textNodes) {
+      let length = 0
+      const textList = textNodes.map(node => {
+        let startIdx = length, endIdx = length + node.wholeText.length
+        length = endIdx
+        return {
+          text: node.wholeText,
+          startIdx,
+          endIdx
+        }
+      })
+      return textList
+    },
+
+    getMatchList (content, keyword) {
+      const characters = [...'\\[]()?.+*^${}:'].reduce((r, c) => (r[c] = true, r), {})
+      keyword = keyword.split('').map(s => characters[s] ? `\\${s}` : s).join('[\\s\\n]*')
+      const reg = new RegExp(keyword, 'gmi')
+      return [...content.matchAll(reg)] // matchAll结果是个迭代器，用扩展符展开得到数组
+    },
+
+    replaceMatchResult (textNodes, textList, matchList) {
+      // 对于每一个匹配结果，可能分散在多个标签中，找出这些标签，截取匹配片段并用font标签替换出
+      for (let i = matchList.length - 1; i >= 0; i--) {
+        const match = matchList[i]
+        const matchStart = match.index, matchEnd = matchStart + match[0].length // 匹配结果在拼接字符串中的起止索引
+        // 遍历文本信息列表，查找匹配的文本节点
+        for (let textIdx = 0; textIdx < textList.length; textIdx++) {
+          const { text, startIdx, endIdx } = textList[textIdx] // 文本内容、文本在拼接串中开始、结束索引
+          if (endIdx < matchStart) continue // 匹配的文本节点还在后面
+          if (startIdx >= matchEnd) break // 匹配文本节点已经处理完了
+          let textNode = textNodes[textIdx] // 这个节点中的部分或全部内容匹配到了关键词，将匹配部分截取出来进行替换
+          const nodeMatchStartIdx = Math.max(0, matchStart - startIdx) // 匹配内容在文本节点内容中的开始索引
+          const nodeMatchLength = Math.min(endIdx, matchEnd) - startIdx - nodeMatchStartIdx // 文本节点内容匹配关键词的长度
+          if (nodeMatchStartIdx > 0) textNode = textNode.splitText(nodeMatchStartIdx) // textNode取后半部分
+          if (nodeMatchLength < textNode.wholeText.length) textNode.splitText(nodeMatchLength)
+          const font = document.createElement('font')
+          font.setAttribute(this.flag, i + 1)
+          font.innerText = text.substr(nodeMatchStartIdx, nodeMatchLength)
+          textNode.parentNode.replaceChild(font, textNode)
+        }
+      }
+    },
+
+    replaceKeywords () {
       if (!this.keyword) {
         this.contentShow = this.content
         return
       }
       const div = document.createElement('div')
       div.innerHTML = this.content
-      const textNodes = []
-      const nodeList = [...div.childNodes]
-      while (nodeList.length) {
-        let node = nodeList.shift()
-        if (node.nodeType == node.TEXT_NODE) {
-          node.wholeText && textNodes.push(node)
-        } else {
-          nodeList.unshift(...node.childNodes)
-        }
-      }
-      let length = 0
-      const textList = textNodes.map(text => {
-        let start = length, end = length + text.wholeText.length
-        length = end
-        return [text.wholeText, start, end]
-      })
-      const content = textList.map(([text]) => text).join('')
-      const characters = [...'\\[]()?.+*^${}:'].reduce((r, c) => (r[c] = true, r), {})
-      const keyword = this.keyword.split('').map(s => characters[s] ? `\\${s}` : s).join('[\\s\\n]*')
-      const reg = new RegExp(keyword, 'gmi')
-      const matchList = [...content.matchAll(reg)]
+      const textNodes = this.getTextNodeList(div)
+      const textList = this.getTextInfoList(textNodes)
+      const content = textList.map(({ text }) => text).join('')
+      const matchList = this.getMatchList(content, this.keyword)
       this.matchCount = matchList.length
       this.lightIndex = this.matchCount ? 1 : 0
-      for (let i = matchList.length - 1; i >= 0; i--) {
-        let match = matchList[i]
-        let matchStart = match.index, matchEnd = matchStart + match[0].length
-        let startIndex = textList.findIndex(x => x[1] <= matchStart && x[2] >= matchStart)
-        let endIndex = textList.findIndex(x => x[1] <= matchEnd && x[2] >= matchEnd)
-        for (let idx = startIndex; idx <= endIndex; idx++) {
-          let textNode = textNodes[idx]
-          let [text, nodeStart, nodeEnd] = textList[idx]
-          let start = Math.max(0, matchStart - nodeStart)
-          let len = Math.min(nodeEnd, matchEnd) - nodeStart - start
-          if (start > 0) textNode = textNode.splitText(start)
-          if (len < textNode.wholeText.length) textNode.splitText(len)
-          let font = document.createElement('font')
-          font.setAttribute(PLUGIN_FLAG, i + 1)
-          font.innerText = text.substr(start, len)
-          textNode.parentNode.replaceChild(font, textNode)
-        }
-      }
+      this.replaceMatchResult(textNodes, textList, matchList)
       this.contentShow = div.innerHTML
     },
     scrollTo (index) {
       this.$nextTick(() => {
-        let node = this.$el.querySelector(`font[${PLUGIN_FLAG}='${index}']`)
+        let node = this.$el.querySelector(`font[${this.flag}='${index}']`)
         if (node) {
           this.lightIndex = index
           node.scrollIntoView()
@@ -149,9 +176,9 @@ export default {
       let style = document.head.querySelector(this.styleSelector)
       if (!style) {
         style = document.createElement('style')
-        style.setAttribute(PLUGIN_FLAG, this.random)
+        style.setAttribute(this.flag, 1)
       }
-      style.innerText = `font[${PLUGIN_FLAG}]{${this.highlightStyle}}font[${PLUGIN_FLAG}='${this.lightIndex}']{${this.currentStyle}}`
+      style.innerText = `font[${this.flag}]{${this.highlightStyle}}font[${this.flag}='${this.lightIndex}']{${this.currentStyle}}`
       document.head.appendChild(style)
     },
     clearStyle () {
