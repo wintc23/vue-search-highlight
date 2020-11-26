@@ -106,10 +106,16 @@ export default {
     },
 
     getMatchList (content, keyword) {
-      const characters = [...'\\[]()?.+*^${}:'].reduce((r, c) => (r[c] = true, r), {})
+      const characters = [...'\\[]()?.+*^${}:|'].reduce((r, c) => (r[c] = true, r), {})
       keyword = keyword.split('').map(s => characters[s] ? `\\${s}` : s).join('[\\s\\n]*')
       const reg = new RegExp(keyword, 'gmi')
-      return [...content.matchAll(reg)] // matchAll结果是个迭代器，用扩展符展开得到数组
+      const matchList = []
+      let match = reg.exec(content)
+      while (match) {
+        matchList.push(match)
+        match = reg.exec(content)
+      }
+      return matchList
     },
 
     replaceMatchResult (textNodes, textList, matchList) {
