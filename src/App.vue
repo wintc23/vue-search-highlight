@@ -13,6 +13,7 @@
         @current-change="currentChange"
         @match-count-change="matchCountChange"
         :content="content"
+        regExp
         :keyword="keyword">
       </search-highlight>
     </div>
@@ -54,6 +55,12 @@ export default {
       斜月沉沉藏海雾，碣石潇湘无限路。
       不知乘月几人归，落月摇情满江树。`,
     }
+  },
+  mounted () {
+    setTimeout(() => {
+      this.keyword = '月'
+      this.$refs.search.scrollTo(15)
+    }, 2000)
   },
   methods: {
     searchLast () {

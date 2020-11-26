@@ -23,6 +23,10 @@ export default {
     currentStyle: {
       type: String,
       default: 'background: #ff9632'
+    },
+    regExp: {
+      type: Boolean,
+      default: false
     }
   },
   data () {
@@ -106,8 +110,10 @@ export default {
     },
 
     getMatchList (content, keyword) {
-      const characters = [...'\\[]()?.+*^${}:|'].reduce((r, c) => (r[c] = true, r), {})
-      keyword = keyword.split('').map(s => characters[s] ? `\\${s}` : s).join('[\\s\\n]*')
+      if (!this.regExp) {
+        const characters = [...'\\[](){}?.+*^$:|'].reduce((r, c) => (r[c] = true, r), {})
+        keyword = keyword.split('').map(s => characters[s] ? `\\${s}` : s).join('[\\s\\n]*')
+      }
       const reg = new RegExp(keyword, 'gmi')
       const matchList = []
       let match = reg.exec(content)
@@ -142,7 +148,16 @@ export default {
     },
 
     replaceKeywords () {
-      if (!this.keyword) {
+      let flag = false
+      if (this.regExp) {
+        try {
+          const reg = new RegExp(this.keyword)
+          if (reg.test('')) flag = 1
+        } catch (err) {
+          flag = 1
+        }
+      }
+      if (flag || !this.keyword) {
         this.contentShow = this.content
         return
       }

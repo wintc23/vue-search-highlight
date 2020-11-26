@@ -27,6 +27,7 @@ components: {
 | keyword | 搜索关键字 |
 | highlightStyle | 所有关键词高亮的样式, 默认'background: #ffff00' |
 | currentStyle | 当前搜索到的关键词样式, 默认default: 'background: #ff9632' | 
+| regExp | 启用正则匹配，会用关键词构建一个正则表达式来匹配。启用时请确保keyword能正确构造正则表达式，并且不会匹配空串，否则组件将不会匹配任何内容 |
 
 ## 组件事件
 | 事件名 | 说明 |
