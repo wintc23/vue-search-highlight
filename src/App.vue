@@ -57,10 +57,12 @@ export default {
     }
   },
   mounted () {
-    setTimeout(() => {
-      this.keyword = '月'
-      this.$refs.search.scrollTo(15)
-    }, 2000)
+    let keywords = ['明月', '江', '春']
+    const map = [...'\\[](){}?.+*^$:|'].reduce((r, c) => (r[c] = true, r), {})
+    keywords = keywords.filter(word => word).map(word => {
+      return word.split('').map(s => map[s] ? `\\${s}` : s).join('[\\s\\n]*')
+    })
+    this.keyword = keywords.join('|')
   },
   methods: {
     searchLast () {
