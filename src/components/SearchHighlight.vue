@@ -148,16 +148,16 @@ export default {
     },
 
     replaceKeywords () {
-      let flag = false
+      let errFlag = false
       if (this.regExp) {
         try {
           const reg = new RegExp(this.keyword)
-          if (reg.test('')) flag = 1
+          if (reg.test('')) errFlag = true
         } catch (err) {
-          flag = 1
+          errFlag = true
         }
       }
-      if (flag || !this.keyword) {
+      if (errFlag || !this.keyword) {
         this.contentShow = this.content
         return
       }
