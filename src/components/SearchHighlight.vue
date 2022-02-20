@@ -158,6 +158,8 @@ export default {
         }
       }
       if (errFlag || !this.keyword) {
+        this.matchCount = 0;
+        this.lightIndex = 0;
         this.contentShow = this.content
         return
       }
